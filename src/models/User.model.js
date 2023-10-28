@@ -9,19 +9,13 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "email is required"],
       unique: true,
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "password is required"],
     },
-    posts: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Post',
-    },
-    ],
   },
   {
     timestamps: true,
