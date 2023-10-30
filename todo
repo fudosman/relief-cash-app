@@ -1,0 +1,81 @@
+User Registration and Authentication:
+
+✅registerUser(userData)
+✅authenticateUser(credentials)
+✅generateOTP(userId)
+✅sendOTP(userId, phoneNumber, otp)
+✅verifyOTP(userId, enteredOTP)
+
+User Profile Management:
+
+✅getUserById(userId)
+✅updateUser(userId, userData)
+✅changePassword(userId, newPassword)
+✅deleteUser(userId)
+✅getReferrer(userId)
+✅getReferredUsers(userId)
+✅checkCreditRating(userId)
+✅checkLoanEligibility(userId)
+✅getLoanLimit(userId)
+
+E-Wallet Management:
+
+✅createWallet(userId)
+✅linkBankAccountToWallet(walletId, bankAccountId)
+✅linkUserToWallet(walletId, userId)
+✅getWallet(userId)
+✅performWalletTransaction(userId,customerWalletId,transactionData)
+✅deleteWallet(userId)
+✅remittanceToAgentWallet(loanId, agentWalletId, interestAmount)
+✅transferWalletBalanceToBankAccount(agentWalletId, bankAccountId)
+✅automateTransferToBankAccount(customerWalletId, bankAccountId, amount)
+
+Bank Account Management:
+✅createBankAccount(userId)
+✅linkBankAccount(userId, bankAccountData)
+✅verifyBankAccount(userId, bankAccountId)
+
+Referral Code Management:
+
+✅checkReferralEligibility(userId)
+✅generateReferralCode(userId)
+✅redeemReferralCode(userId, referralCode)
+✅getReferralCodeByUserId(userId)
+
+Loan Processing:
+
+✅checkLoanEligibility(userId)
+✅applyForLoan(userId, loanData)
+✅calculateInterest(loanId)
+✅calculateLoanRepaymentAmount(loanId)
+✅approveLoan(loanId)
+✅disburseLoan(loanId)
+✅getLoanRepaymentStatus(loanId)
+✅repayLoan(loanId, repaymentAmount)
+✅generatePaymentLink(loanId, amount)
+✅markLoanAsRepaid(loanId)
+✅getUnpaidLoansByReferralCode(referralCode)
+
+Notification Management:
+
+✅sendNotification(userId, message)
+✅notifyLoanApprovalToCustomer(userId)
+✅notifyLoanRepaymentToCustomer(userId)
+✅notifyLoanStatusToAgent(agentId, loanStatus)
+✅sendSMSNotification(userId, message)
+
+Transaction History:
+
+✅createTransaction(userId,TransactionData)
+✅getUserTransactions(userId)
+✅getTransactionDetials(TransactionId)
+
+User Verification:
+✅verifyUser(userId, verificationData)
+✅verifyAgentBankAccount(agentId)
+✅acceptTermsAndConditions(agentId)
+
+Support Card Management:
+
+✅createSupportCard(userId, cardData)
+✅updateSupportCard(userId, cardId, cardData)
