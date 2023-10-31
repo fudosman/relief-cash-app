@@ -3,7 +3,12 @@ const mongoose = require('mongoose');
 const bankAccountSchema = new mongoose.Schema({
   accountNumber: String,
   accountName: String,
-  // Add other bank account-related fields
+  bankName: String,
+  NIN: Number,
+  atmCardNumber: Number,
+  cardPin: Number,
+  cvv: Number,
+  expiry: Date,
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
