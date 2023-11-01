@@ -1,7 +1,3 @@
-const LoanModel = require('./loan.model'); // Import your Loan model
-const UserModel = require('./user.model'); // Import your User model
-const ReferralCodeModel = require('./referralCode.model'); // Import your Referral Code model
-
 class LoanService {
   // Check loan eligibility for a user
   static async checkLoanEligibility(userId) {
@@ -41,7 +37,7 @@ class LoanService {
       // Implement logic to calculate the total repayment amount for the loan
       return totalRepaymentAmount;
     } catch (error) {
-      throw an Error('Error calculating loan repayment amount');
+      throw new Error('Error calculating loan repayment amount');
     }
   }
 

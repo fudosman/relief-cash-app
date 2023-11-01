@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // Define an enum for uidType
-const uidTypes = ['PHONE', 'NIN', 'BVN', 'TIN'];
+const uidTypes = ['NIN', 'BVN', 'TIN'];
 
 // Define a subdocument for the tier information
 const tierSchema = new Schema({
@@ -46,6 +46,7 @@ const userSchema = new Schema({
   transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
   creditRating: { type: Schema.Types.ObjectId, ref: 'CreditRating' },
   uid: String,
+  uidType: String,
   tier: tierSchema, // Embed the tier information
   dateOfBirth: Date,
   countryOfBirth: String,

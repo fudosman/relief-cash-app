@@ -1,5 +1,4 @@
-const UserModel = require('./user.model'); // Import your User model
-const AgentModel = require('./agent.model'); // Import your Agent model
+// Import your Agent model
 
 class UserService {
   // Register a new user

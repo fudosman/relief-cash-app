@@ -8,6 +8,7 @@ const referralCodeService = require('./referralCode.service');
 const transactionService = require('./transaction.service');
 const userService = require('./user.service');
 const walletService = require('./wallet.service');
+const hashService = require('./hash.service');
 
 module.exports = {
   authService,
@@ -19,5 +20,6 @@ module.exports = {
   referralCodeService,
   transactionService,
   userService,
-  walletService
+  walletService,
+  hashService
 }
