@@ -1,4 +1,5 @@
 const { authService, jwtService, userService, walletService, hashService, bankAccountService } = require("../services");
+const { registerUtil } = require("../utils");
 
 const register = async function (req, res) {
   try {
@@ -14,12 +15,14 @@ const register = async function (req, res) {
     const bankAccount = await bankAccountService.createBankAccount(bankAccountData);
     const wallet = await walletService.createWallet(walletData);
     const hashedPassword = await hashService.hashPassword(payload.password);
+    const Names = await registerUtil.splitFullName(paload.fullName);
 
     const userData = {
       title: payload.title,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      middleName: payload.middleName,
+      firstName: Names.firstName,
+      lastName: Names.lastName,
+      role: payload.role,
+      middleName: Names.middleName,
       businessName: payload.businessName,
       email: payload.email,
       phoneNumber: payload.phoneNumber,

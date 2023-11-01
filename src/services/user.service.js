@@ -1,11 +1,11 @@
 // Import your Agent model
-
+const { User } = require('../models');
 class UserService {
   // Register a new user
   static async registerUser(userData) {
     try {
       // Implement logic to register a new user with the provided data
-      const user = await UserModel.create(userData);
+      const user = await User.create(userData);
       return user;
     } catch (error) {
       throw new Error('Error registering new user');
