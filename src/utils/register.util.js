@@ -12,6 +12,13 @@ class RegistrationUtil {
       surname,
     }
   }
-}
 
+  static async formatPhoneNumber(phoneNumber, countryCode = 234) {
+    const formattedPhoneNumber = phoneNumber[0] === 0 || '0' ? phoneNumber.replace(/^0+/, '') : phoneNumber;
+
+    const fullPhoneNumber = `+${countryCode}${formattedPhoneNumber}`;
+
+    return fullPhoneNumber;
+  }
+}
 module.exports = RegistrationUtil;

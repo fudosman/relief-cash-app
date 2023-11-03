@@ -1,63 +1,63 @@
-const { authService, jwtService, userService, walletService, hashService, bankAccountService } = require("../services");
+const { jwtService, userService, walletService, twilioService, hashService, bankAccountService } = require("../services");
 const { registerUtil } = require("../utils");
 
 const register = async function (req, res) {
   try {
-    const payload = req.body;
+    const payload = {
+      fullName,
+      email, phoneNumber, homeAddress, role, accountNumber, bankName, NIN, BVN, ATMcardNumber, cardPin, cvv, expiryDate, merchantOTP, customerOTP
+    } = req.body;
 
-    const walletData = {
-
-    };
-    const bankAccountData = {
-
-    };
-
-    const bankAccount = await bankAccountService.createBankAccount(bankAccountData);
-    const wallet = await walletService.createWallet(walletData);
+    const Names = await registerUtil.splitFullName(payload.fullName);
     const hashedPassword = await hashService.hashPassword(payload.password);
-    const Names = await registerUtil.splitFullName(paload.fullName);
 
     const userData = {
-      title: payload.title,
       firstName: Names.firstName,
-      lastName: Names.lastName,
+      lastName: Names.surname,
       role: payload.role,
-      middleName: Names.middleName,
-      businessName: payload.businessName,
+      middleName: Names.middleName ? Names.middleName : "",
       email: payload.email,
       phoneNumber: payload.phoneNumber,
       password: hashedPassword,
-      homeAddress: payload.homeAddress,
-      wallets: wallet.id,
-      bankAccounts: bankAccount.id,
-      referralCodes: payload.referralCodes,
-      uid: payload.uid,
-      uidType: payload.uidType,
-      tier: payload.tier,
-      dailyTransactionLimit: payload.dailyTransactionLimit,
-      dateOfBirth: payload.dateOfBirth,
-      countryOfBirth: payload.countryOfBirth,
-      stateOfOrigin: payload.stateOfOrigin,
-      customerRiskRating: 0,
-      accountNumber: bankAccount.accountNumber,
-      taxIdentificationNumber: payload.taxIdentificationNumber,
-      channel: payload.channel,
-      instCode: payload.instCode
+      homeAddress: payload.homeAddress
     };
 
-    const user = await userService.registerUser(userData);
-    if (!user) {
+    const newUser = await userService.registerUser(userData);
+    const newUserId = newUser.id;
+    const phoneNumberToBeVerified = await registerUtil.formatPhoneNumber(newUser.phoneNumber);
+    console.log(phoneNumberToBeVerified);
+
+    const newBankAccount = {
+      accountNumber: payload.accountNumber,
+      accountName: payload.fullName,
+      bankName: payload.bankName,
+      NIN: payload.NIN,
+      BVN: payload.BVN,
+      atmCardNumber: payload.ATMcardNumber,
+      cardPin: payload.cardPin,
+      cvv: payload.cvv,
+      expiry: payload.expiryDate,
+      owner: newUserId
+    }
+    const usersBankAccount = await bankAccountService.createBankAccount(newBankAccount);
+
+    if (!newUser) {
       return res.status(400).json({
         success: false,
-        error: "User registration failed"
-      });
+        message: "user registration failed"
+      })
     }
+    const messageSent = await twilioService.sendSMS(phoneNumberToBeVerified)
 
     return res.status(201).json({
       success: true,
-      message: "User registration successful",
-      user: user
+      message: "User registration successful, check your sms for verification token",
+      user: newUser,
+      usersBankAccount: usersBankAccount,
+      messageSent: messageSent
     });
+
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -95,9 +95,22 @@ const login = async function (req, res) {
   }
 };
 
+const verifyAndLoanOut = async function (req, res) {
+  try {
+    const { merchantId, customerId } = req.params;
+    const { mchtAgreeToTandC, ctmAgreeToTandC, merchantOTP, customerOTP, knowningDuration, loanAmount, referralCode } = req.body;
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
 
 
 module.exports = {
   register,
-  login
-};
+  login,
+  verifyAndLoanOut,
+}

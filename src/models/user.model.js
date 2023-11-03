@@ -3,21 +3,12 @@ const Schema = mongoose.Schema;
 
 // Define an enum for uidType
 const uidTypes = ['NIN', 'BVN', 'TIN'];
-const roles = ['Adim', 'Merchant', 'Customer'];
 
-const roleSchema = new Schema({
-  role: {
-    type: String,
-    enum: roles,
-    required: true,
-  }
-});
 // Define a subdocument for the tier information
 const tierSchema = new Schema({
   uidType: {
     type: String,
     enum: uidTypes,
-    required: true,
   },
   dailyTransactionLimit: Number,
   dailyCumulativeBalance: Number,
@@ -43,9 +34,11 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
+  },
+  homeAddress: {
+    type: String,
     required: true,
   },
-  homeAddress: String,
   profilePicture: String,
   wallets: [{ type: Schema.Types.ObjectId, ref: 'Wallet' }],
   bankAccounts: [{ type: Schema.Types.ObjectId, ref: 'BankAccount' }],
@@ -57,7 +50,11 @@ const userSchema = new Schema({
   uid: String,
   uidType: String,
   tier: tierSchema,
-  role: roleSchema, // Embed the tier information
+  role: {
+    type: String,
+    enum: ['Admin', 'Merchant', 'Customer'],
+    required: true,
+  }, // Embed the tier information
   dateOfBirth: Date,
   countryOfBirth: String,
   stateOfOrigin: String,

@@ -4,12 +4,12 @@ const bankAccountSchema = new mongoose.Schema({
   accountNumber: String,
   accountName: String,
   bankName: String,
-  NIN: Number,
-  atmCardNumber: Number,
-  cardPin: Number,
-  cvv: Number,
+  NIN: String,
+  atmCardNumber: String,
+  cardPin: String,
+  cvv: String,
   expiry: Date,
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
 const BankAccount = mongoose.model('BankAccount', bankAccountSchema);

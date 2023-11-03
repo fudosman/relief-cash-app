@@ -5,10 +5,10 @@ class UserService {
   static async registerUser(userData) {
     try {
       // Implement logic to register a new user with the provided data
-      const user = await User.create(userData);
-      return user;
+      const newUser = await User.create(userData);
+      return newUser;
     } catch (error) {
-      throw new Error('Error registering new user');
+      throw new Error('Error registering new user: ' + error.message);
     }
   }
 

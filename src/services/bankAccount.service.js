@@ -1,9 +1,8 @@
+const { BankAccount } = require('../models');
 class BankAccountService {
-  // Create a new bank account for a user
-  static async createBankAccount(userId) {
+  static async createBankAccount(data) {
     try {
-      // Implement logic to create a new bank account associated with the user
-      const bankAccount = await BankAccountModel.create({ user: userId });
+      const bankAccount = await BankAccount.create(data);
       return bankAccount;
     } catch (error) {
       throw new Error('Error creating bank account');

@@ -1,22 +1,22 @@
-const bankAccount = require("./bankAccount.model");
-const creditRating = require("./creditRating.model");
-const customerSupportCard = require("./customerSupport.model");
-const loan = require("./loan.model");
-const notification = require("./notifications.model");
-const referralCode = require("./referralCode.model");
-const transaction = require("./transaction.model");
+const BankAccount = require("./bankAccount.model");
+const CreditRating = require("./creditRating.model");
+const CustomerSupportCard = require("./customerSupport.model");
+const Loan = require("./loan.model");
+const Notification = require("./notifications.model");
+const ReferralCode = require("./referralCode.model");
+const Transaction = require("./transaction.model");
 const User = require('./user.model');
-const wallet = require('./wallet.model');
+const Wallet = require('./wallet.model');
 
 
 module.exports = {
-    bankAccount,
-    creditRating,
-    customerSupportCard,
-    loan,
-    notification,
-    referralCode,
-    transaction,
+    BankAccount,
+    CreditRating,
+    CustomerSupportCard,
+    Loan,
+    Notification,
+    ReferralCode,
+    Transaction,
     User,
-    wallet,
+    Wallet,
 };
