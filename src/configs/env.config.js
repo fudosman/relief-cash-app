@@ -11,6 +11,6 @@ module.exports = {
     dbUrl: process.env.MONGO_URL,
     accountSid: process.env.ACCOUNT_SID,
     apiKeySecret: process.env.AUTHENTICATION_TOKEN,
-    twilioApiKey: process.env.TWILIO_API_KEY,
+    verifySid: process.env.VERIFY_SID,
     myPhoneNumber: process.env.SMS_PHONE_NUMBER,
 }
