@@ -12,6 +12,15 @@ class UserService {
     }
   }
 
+  static async fetchUser(userId) {
+    try {
+      const newUser = await User.findOne({ _id: userId });
+      return newUser
+    } catch (error) {
+      throw new Error(" Error fetching user: " + error.message);
+    }
+  }
+
   // Authenticate a user with credentials
   static async authenticateUser(credentials) {
     try {
@@ -33,25 +42,6 @@ class UserService {
     }
   }
 
-  // Send OTP to a user's phone number
-  static async sendOTP(userId, phoneNumber, otp) {
-    try {
-      // Implement logic to send the OTP to the user's phone number
-      return sentOTPResult;
-    } catch (error) {
-      throw new Error('Error sending one-time password (OTP)');
-    }
-  }
-
-  // Verify OTP entered by a user
-  static async verifyOTP(userId, enteredOTP) {
-    try {
-      // Implement logic to verify the OTP entered by the user
-      return verificationResult;
-    } catch (error) {
-      throw new Error('Error verifying user one-time password (OTP)');
-    }
-  }
 
   // Verify a user with the provided verification data
   static async verifyUser(userId, verificationData) {
@@ -74,6 +64,8 @@ class UserService {
       throw new Error('Error verifying agent bank account');
     }
   }
+
+
 
   // Accept terms and conditions for an agent
   static async acceptTermsAndConditions(agentId) {

@@ -1,5 +1,14 @@
+const { Loan } = require('../models');
 class LoanService {
-  // Check loan eligibility for a user
+  static async createLoan(data) {
+    try {
+      const newLoan = await new Loan(data);
+      const loan = newLoan.save();
+      return loan;
+    } catch (error) {
+      throw new Error(`Error creating loan: ${error.message}`);
+    }
+  }
   static async checkLoanEligibility(userId) {
     try {
       // Implement logic to check if the user is eligible for a loan

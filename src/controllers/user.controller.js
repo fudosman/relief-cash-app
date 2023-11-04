@@ -1,4 +1,4 @@
-const { jwtService, userService, walletService, twilioService, hashService, bankAccountService } = require("../services");
+const { jwtService, userService, walletService, loanService, twilioService, hashService, bankAccountService } = require("../services");
 const { registerUtil } = require("../utils");
 
 const register = async function (req, res) {
@@ -98,7 +98,38 @@ const login = async function (req, res) {
 const verifyAndLoanOut = async function (req, res) {
   try {
     const { merchantId, customerId } = req.params;
+
+    // get the codes from the merchant and the customer
     const payload = { mchtAgreeToTandC, ctmAgreeToTandC, merchantOTP, customerOTP, knowningDuration, loanAmount, referralCode } = req.body;
+
+    // fetch their phone numbers
+    const mchtPhoneNumber = { phoneNumber } = await userService.fetchUser(merchantId);
+    const ctmPhoneNumber = { phoneNumber } = await userService.fetchUser(customerId);
+    const merchantPhoneNumber = await registerUtil.formatPhoneNumber(mchtPhoneNumber);
+    const customerPhoneNumber = await registerUtil.formatPhoneNumber(ctmPhoneNumber);
+
+    // verify their authenticity
+    const merchantVerificationStatus = await twilioService.checkOTP(merchantPhoneNumber, merchantOTP)
+    const customerVerificationStatus = await twilioService.checkOTP(customerPhoneNumber, customerOTP)
+
+    // create a loan
+    if (merchantVerificationStatus && customerVerificationStatus === "approved") {
+      const newLoan = {
+        amount: loanAmount,
+        interestRate: 5,
+        customer: customerId,
+        agent: merchantId
+      }
+
+      // save the loan 
+      const loan = await loanService.createLoan(newLoan);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Thank you, your application to disburse a new loan has been successfully Made. you will be notified when it is approved and the load will be disbursed',
+      loan: loan
+    })
 
   } catch (error) {
     return res.status(500).json({
