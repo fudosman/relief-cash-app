@@ -98,7 +98,7 @@ const login = async function (req, res) {
 const verifyAndLoanOut = async function (req, res) {
   try {
     const { merchantId, customerId } = req.params;
-    const { mchtAgreeToTandC, ctmAgreeToTandC, merchantOTP, customerOTP, knowningDuration, loanAmount, referralCode } = req.body;
+    const payload = { mchtAgreeToTandC, ctmAgreeToTandC, merchantOTP, customerOTP, knowningDuration, loanAmount, referralCode } = req.body;
 
   } catch (error) {
     return res.status(500).json({
