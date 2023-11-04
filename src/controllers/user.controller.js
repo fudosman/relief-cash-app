@@ -52,9 +52,9 @@ const register = async function (req, res) {
     return res.status(201).json({
       success: true,
       message: "User registration successful, check your sms for verification token",
-      user: newUser,
-      usersBankAccount: usersBankAccount,
-      messageSent: messageSent
+      messageSent: messageSent,
+      merchantId: req.user ? req.user.id : "",
+      customerId: req.user ? newUser.id : "",
     });
 
 
