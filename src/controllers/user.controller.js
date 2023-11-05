@@ -117,10 +117,8 @@ const verifyAndLoanOut = async function (req, res) {
   try {
     const { merchantId, customerId } = req.params;
 
-    // get the codes from the merchant and the customer
     const payload = { mchtAgreeToTandC, ctmAgreeToTandC, merchantOTP, customerOTP, knowningDuration, loanAmount, referralCode } = req.body;
 
-    // fetch their phone numbers
     const mcht = await userService.fetchUser(merchantId);
     const ctm = await userService.fetchUser(customerId);
 
@@ -130,15 +128,12 @@ const verifyAndLoanOut = async function (req, res) {
     const merchantPhoneNumber = await registerUtil.formatPhoneNumber(mchtPhoneNumber);
     const customerPhoneNumber = await registerUtil.formatPhoneNumber(ctmPhoneNumber);
 
-
-    // verify their authenticity
     const merchantVerificationStatus = await twilioService.checkOTP(merchantPhoneNumber, payload.merchantOTP)
     const customerVerificationStatus = await twilioService.checkOTP(customerPhoneNumber, payload.customerOTP);
 
     let loan;
     const GeneralInterestRate = 5;
 
-    // create a loan
     if (merchantVerificationStatus === "approved" && customerVerificationStatus === "approved") {
       const newLoan = {
         mchtAgreeToTandC: payload.mchtAgreeToTandC,
