@@ -24,8 +24,8 @@ const register = async function (req, res) {
 
     const newUser = await userService.registerUser(userData);
     const newUserId = newUser.id;
-    const phoneNumberToBeVerified = await registerUtil.formatPhoneNumber(newUser.phoneNumber);
-    console.log(phoneNumberToBeVerified);
+    const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(newUser.phoneNumber);
+    const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(req.user.phoneNumber);
 
     const newBankAccount = {
       accountNumber: payload.accountNumber,
@@ -39,6 +39,7 @@ const register = async function (req, res) {
       expiry: payload.expiryDate,
       owner: newUserId
     }
+
     const usersBankAccount = await bankAccountService.createBankAccount(newBankAccount);
 
     if (!newUser) {
@@ -47,14 +48,18 @@ const register = async function (req, res) {
         message: "user registration failed"
       })
     }
-    const messageSent = await twilioService.sendSMS(phoneNumberToBeVerified)
+
+    const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
+    const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
 
     return res.status(201).json({
       success: true,
       message: "User registration successful, check your sms for verification token",
-      messageSent: messageSent,
+      merchantMessageSent: merchantMessageSent,
+      customerMessageSent: customerMessageSent,
       merchantId: req.user ? req.user.id : "",
       customerId: req.user ? newUser.id : "",
+      usersBankAccount: usersBankAccount,
     });
 
 
@@ -71,15 +76,28 @@ const login = async function (req, res) {
   try {
     const payload = req.body;
     const userData = {
-      username: payload.username,
+      email: payload.email,
       password: payload.password
+    };
+
+    const user = await userService.fetchUserByEmail(userData.email);
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found',
+      })
     }
-    const authenticatedUser = userService.authenticateUser(userData);
-    const token = jwtService.signToken(authenticatedUser);
+    const isValid = await hashService.verifyPassword(user.password, userData.password);
+    let token;
+
+    if (isValid) {
+      token = await jwtService.signToken({ user });
+    }
+
     if (!token) {
       return res.status(305).json({
         success: false,
-        error: `jwt error, token not found`
+        error: `Error creating token`
       })
     }
     return res.status(200).json({
@@ -103,26 +121,36 @@ const verifyAndLoanOut = async function (req, res) {
     const payload = { mchtAgreeToTandC, ctmAgreeToTandC, merchantOTP, customerOTP, knowningDuration, loanAmount, referralCode } = req.body;
 
     // fetch their phone numbers
-    const mchtPhoneNumber = { phoneNumber } = await userService.fetchUser(merchantId);
-    const ctmPhoneNumber = { phoneNumber } = await userService.fetchUser(customerId);
+    const mcht = await userService.fetchUser(merchantId);
+    const ctm = await userService.fetchUser(customerId);
+
+    const mchtPhoneNumber = mcht.phoneNumber;
+    const ctmPhoneNumber = ctm.phoneNumber;
+
     const merchantPhoneNumber = await registerUtil.formatPhoneNumber(mchtPhoneNumber);
     const customerPhoneNumber = await registerUtil.formatPhoneNumber(ctmPhoneNumber);
 
+
     // verify their authenticity
-    const merchantVerificationStatus = await twilioService.checkOTP(merchantPhoneNumber, merchantOTP)
-    const customerVerificationStatus = await twilioService.checkOTP(customerPhoneNumber, customerOTP)
+    const merchantVerificationStatus = await twilioService.checkOTP(merchantPhoneNumber, payload.merchantOTP)
+    const customerVerificationStatus = await twilioService.checkOTP(customerPhoneNumber, payload.customerOTP);
+
+    let loan;
+    const GeneralInterestRate = 5;
 
     // create a loan
-    if (merchantVerificationStatus && customerVerificationStatus === "approved") {
+    if (merchantVerificationStatus === "approved" && customerVerificationStatus === "approved") {
       const newLoan = {
-        amount: loanAmount,
-        interestRate: 5,
+        mchtAgreeToTandC: payload.mchtAgreeToTandC,
+        ctmAgreeToTandC: payload.ctmAgreeToTandC,
+        knowningDuration: payload.knowningDuration,
+        referralCode: payload.referralCode,
+        amount: parseFloat(payload.loanAmount).toFixed(2),
+        interestRate: parseInt(GeneralInterestRate),
         customer: customerId,
         agent: merchantId
       }
-
-      // save the loan 
-      const loan = await loanService.createLoan(newLoan);
+      loan = await loanService.createLoan(newLoan);
     }
 
     return res.status(200).json({
@@ -130,7 +158,6 @@ const verifyAndLoanOut = async function (req, res) {
       message: 'Thank you, your application to disburse a new loan has been successfully Made. you will be notified when it is approved and the load will be disbursed',
       loan: loan
     })
-
   } catch (error) {
     return res.status(500).json({
       success: false,

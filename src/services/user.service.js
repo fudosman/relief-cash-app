@@ -21,14 +21,12 @@ class UserService {
     }
   }
 
-  // Authenticate a user with credentials
-  static async authenticateUser(credentials) {
+  static async fetchUserByEmail(email) {
     try {
-      // Implement logic to authenticate a user with the provided credentials
-      const user = await UserModel.findOne(credentials);
-      return user;
+      const newUser = await User.findOne({ email: email });
+      return newUser
     } catch (error) {
-      throw new Error('Error logging in user');
+      throw new Error(" Error fetching User by Email: " + error.message);
     }
   }
 

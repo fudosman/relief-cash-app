@@ -2,8 +2,8 @@ const { Loan } = require('../models');
 class LoanService {
   static async createLoan(data) {
     try {
-      const newLoan = await new Loan(data);
-      const loan = newLoan.save();
+      const newLoan = new Loan(data);
+      const loan = await newLoan.save();
       return loan;
     } catch (error) {
       throw new Error(`Error creating loan: ${error.message}`);
