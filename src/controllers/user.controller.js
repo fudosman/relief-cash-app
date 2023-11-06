@@ -141,6 +141,7 @@ const verifyAndLoanOut = async function (req, res) {
         knowningDuration: payload.knowningDuration,
         referralCode: payload.referralCode,
         amount: parseFloat(payload.loanAmount).toFixed(2),
+        status: "pending",
         interestRate: parseInt(GeneralInterestRate),
         customer: customerId,
         agent: merchantId

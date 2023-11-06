@@ -6,6 +6,12 @@ const loanSchema = new mongoose.Schema({
   amount: Number,
   interestRate: Number,
   knowingDuration: String,
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected", "repaid"],
+    default: "pending"
+  },
+  rejectReason: String,
   referralCode: String,
   customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   agent: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

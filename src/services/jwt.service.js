@@ -53,6 +53,35 @@ class JwtService {
             })
         }
     }
+
+    static async isAdmin(req, res, next) {
+        try {
+            const role = req.user.role;
+            if (role === 'Admin') {
+                next();
+            } else if (role === 'Customer') {
+                return res.status(403).json({
+                    success: false,
+                    message: `Not Allowed, you are a customer`
+                });
+            } else if (role === 'Merchant') {
+                return res.status(403).json({
+                    success: false,
+                    message: `Not Allowed, you are a merchant`
+                });
+            } else {
+                return res.status(403).json({
+                    success: false,
+                    message: `Permission denied`
+                });
+            }
+        } catch (error) {
+            return res.status(403).json({
+                success: false,
+                message: `Not An Admin: ${error.message}`
+            });
+        }
+    }
 }
 
 module.exports = JwtService;

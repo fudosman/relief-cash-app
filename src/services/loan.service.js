@@ -9,115 +9,31 @@ class LoanService {
       throw new Error(`Error creating loan: ${error.message}`);
     }
   }
-  static async checkLoanEligibility(userId) {
+
+  static async fetchAllLoans(data) {
     try {
-      // Implement logic to check if the user is eligible for a loan
-      // This may involve assessing credit ratings and other criteria
-      return isEligible;
+      const allLoans = await Loan.find(data);
+      return allLoans;
     } catch (error) {
-      throw new Error('Error checking loan eligibility');
+      throw new Error(`Error fetching all loan: ${error.message}`);
     }
   }
 
-  // Apply for a loan
-  static async applyForLoan(userId, loanData) {
+  static async fetchLoan(loanId) {
     try {
-      // Implement logic to create a new loan application for the user
-      const loan = await LoanModel.create({ user: userId, ...loanData });
+      const loan = await Loan.findOne({ _id: loanId });
       return loan;
     } catch (error) {
-      throw new Error('Error applying for a loan');
+      throw new Error(`Error fetching loan: ${error.message}`);
     }
   }
 
-  // Calculate interest for a loan
-  static async calculateInterest(loanId) {
+  static async updateLoan(loanId, data) {
     try {
-      // Implement logic to calculate the interest for the specified loan
-      return interestAmount;
+      const updatedLoan = await Loan.findOneAndUpdate({ _id: loanId }, data, { new: true });
+      return updatedLoan;
     } catch (error) {
-      throw new Error('Error calculating loan interest');
-    }
-  }
-
-  // Calculate loan repayment amount
-  static async calculateLoanRepaymentAmount(loanId) {
-    try {
-      // Implement logic to calculate the total repayment amount for the loan
-      return totalRepaymentAmount;
-    } catch (error) {
-      throw new Error('Error calculating loan repayment amount');
-    }
-  }
-
-  // Approve a loan
-  static async approveLoan(loanId) {
-    try {
-      // Implement logic to approve the loan application
-      // This may involve updating the loan status or other actions
-      return approvalResult;
-    } catch (error) {
-      throw new Error('Error approving the loan');
-    }
-  }
-
-  // Disburse a loan
-  static async disburseLoan(loanId) {
-    try {
-      // Implement logic to disburse the approved loan amount to the user's wallet
-      return disbursementResult;
-    } catch (error) {
-      throw new Error('Error disbursing the loan');
-    }
-  }
-
-  // Get loan repayment status
-  static async getLoanRepaymentStatus(loanId) {
-    try {
-      // Implement logic to retrieve the repayment status of the loan
-      return repaymentStatus;
-    } catch (error) {
-      throw new Error('Error getting loan repayment status');
-    }
-  }
-
-  // Repay a loan
-  static async repayLoan(loanId, repaymentAmount) {
-    try {
-      // Implement logic to record a loan repayment and update the loan's status
-      return repaymentResult;
-    } catch (error) {
-      throw new Error('Error repaying the loan');
-    }
-  }
-
-  // Generate a payment link for a loan
-  static async generatePaymentLink(loanId, amount) {
-    try {
-      // Implement logic to generate a payment link for the specified loan and amount
-      return paymentLink;
-    } catch (error) {
-      throw new Error('Error generating payment link');
-    }
-  }
-
-  // Mark a loan as repaid
-  static async markLoanAsRepaid(loanId) {
-    try {
-      // Implement logic to mark the loan as repaid
-      return markAsRepaidResult;
-    } catch (error) {
-      throw new Error('Error marking the loan as repaid');
-    }
-  }
-
-  // Get unpaid loans by referral code
-  static async getUnpaidLoansByReferralCode(referralCode) {
-    try {
-      // Implement logic to retrieve unpaid loans associated with a referral code
-      return unpaidLoans;
-    } catch (error) {
-      throw new Error('Error getting unpaid loans by referral code');
+      throw new Error(`Error fetching loan: ${error.message}`);
     }
   }
 }

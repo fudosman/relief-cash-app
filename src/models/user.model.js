@@ -53,6 +53,7 @@ const userSchema = new Schema({
   role: {
     type: String,
     enum: ['Admin', 'Merchant', 'Customer'],
+    default: 'Customer',
     required: true,
   }, // Embed the tier information
   dateOfBirth: Date,
