@@ -74,6 +74,8 @@ const updateLoan = async (req, res) => {
     const messages = [];
     const loanId = req.params.loanId;
     let loanData = {};
+    const currentUser = req.user;
+    const loanAgent = await loanService.fetchLoan(loanId);
 
     if (status) {
       const statusMessages = {
@@ -83,15 +85,12 @@ const updateLoan = async (req, res) => {
       };
       if (status === "approved") {
         // check if the user is the agent to approve the loan
-        const currentUser = req.user;
-        const loanAgent = await loanService.fetchLoan(loanId);
-
         console.log({
           currentUser: currentUser.id,
           loanAgent: loanAgent.id
         });
+        // check if the agent is in good standing to approve the loan(using the defaulterService)
 
-        // check if the agent is in good standing to approve the loan
         // fetch the customers bank information
         // fetch the agents wallet information
         // fetch the customers wallet information
