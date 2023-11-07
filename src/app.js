@@ -1,5 +1,7 @@
 const express = require("express");
-const asyncHandler = require('express-async-handler')
+const asyncHandler = require('express-async-handler');
+const treblle = require("@treblle/express");
+const { TRB_API_KEY, TRB_PROJ_ID } = require("./configs").env;
 const { handler, error404, homePageError } = require('./errors');
 const user = require('./routes/user.route');
 const admin = require('./routes/admin.route');
@@ -24,6 +26,13 @@ app.use((req, res, next) => {
   console.log(`${req.method} request hit the route ${req.url}`);
   next();
 });
+
+app.use(
+  treblle({
+    apiKey: TRB_API_KEY,
+    projectId: TRB_PROJ_ID,
+  })
+);
 
 // handlers
 app.get("/", homePageError);
