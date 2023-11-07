@@ -1,4 +1,4 @@
-const { jwtService, userService, walletService, loanService, twilioService, hashService, bankAccountService } = require("../services");
+const { jwtService, userService, walletService, cloudinaryService, loanService, twilioService, hashService, bankAccountService } = require("../services");
 const { registerUtil } = require("../utils");
 
 const register = async function (req, res) {
@@ -113,6 +113,29 @@ const login = async function (req, res) {
   }
 };
 
+const uploadImage = async function (req, res) {
+  try {
+    const file = [...(req.files.images || [])];
+
+    const media = await cloudinaryService.uploadMedia(file[0]);
+
+    const profilePicture = media.secure_url;
+
+    const userWithProfilePicture = await userService.setProfilePicture(req.user.id, profilePicture);
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile picture updated successfully",
+      user: userWithProfilePicture,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+};
+
 const verifyAndLoanOut = async function (req, res) {
   try {
     const { merchantId, customerId } = req.params;
@@ -162,9 +185,54 @@ const verifyAndLoanOut = async function (req, res) {
   }
 }
 
+const editProfile = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { firstName, lastName, phoneNumber, homeAddress } = req.query;
+    const profileData = {};
+    const message = [];
+
+    if (firstName) {
+      profileData.firstName = firstName;
+      message.push("firstname updated");
+    }
+
+    if (lastName) {
+      profileData.lastName = lastName;
+      message.push("lastname updated");
+    }
+
+    if (phoneNumber) {
+      profileData.phoneNumber = phoneNumber;
+      message.push("phone number updated");
+    }
+
+    if (homeAddress) {
+      profileData.homeAddress = homeAddress;
+      message.push("home address updated");
+    }
+
+    const updatedUser = await userService.updateBasicDetails(userId, profileData);
+    const singleMessage = message.join(", ");
+
+    return res.status(200).json({
+      success: true,
+      message: singleMessage,
+      user: updatedUser,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 
 module.exports = {
   register,
   login,
   verifyAndLoanOut,
+  uploadImage,
+  editProfile,
 }

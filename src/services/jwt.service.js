@@ -33,7 +33,6 @@ class JwtService {
             }
             // decode the token
             const decoded = jwt.verify(token, jwtPrivateKey);
-
             // check if the user exists
             const user = await User.findById(decoded.user._id);
             if (!user) {
@@ -41,7 +40,8 @@ class JwtService {
                     error: "User Not Found",
                 });
             }
-            console.log(user.firstName + " is successfully authenticated");
+            console.log(user.firstName + " " + user.lastName + " with the role " + user.role + " is successfully authenticated");
+
             // add the user to the request
             req.user = user;
             // call the next middleware

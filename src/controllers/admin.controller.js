@@ -83,21 +83,26 @@ const updateLoan = async (req, res) => {
         rejected: "Your account has been rejected",
         repaid: "Your loan has been repaid",
       };
-      if (status === "approved") {
-        // check if the user is the agent to approve the loan
-        console.log({
-          currentUser: currentUser.id,
-          loanAgent: loanAgent.id
-        });
-        // check if the agent is in good standing to approve the loan(using the defaulterService)
 
-        // fetch the customers bank information
-        // fetch the agents wallet information
-        // fetch the customers wallet information
-        // create a transaction
-        // move money from agents wallet to customers wallet to customers bank account
-        // save the transaction
+      if (status === "approved") {
+        // check the customers credit score
+        // check the merchants ability to disburse the loan
+        // create the transaction
+        // create notification
       }
+
+      if (status === "rejected") {
+        // add the rejection reason
+        // create notiication
+      }
+
+      if (status === "repaid") {
+        // calculate the customers credit score
+        // calculate the merchants risk rating
+        // create the transaction
+        // create notification
+      }
+
       loanData.status = status;
       messages.push(statusMessages[status] || '');
     }
@@ -139,8 +144,6 @@ const updateLoan = async (req, res) => {
     });
   }
 };
-
-
 
 
 module.exports = {

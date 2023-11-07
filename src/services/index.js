@@ -10,6 +10,7 @@ const userService = require('./user.service');
 const walletService = require('./wallet.service');
 const hashService = require('./hash.service');
 const twilioService = require('./twilio.service');
+const cloudinaryService = require('./cloudinary.service');
 
 module.exports = {
   authService,
@@ -23,5 +24,6 @@ module.exports = {
   userService,
   walletService,
   hashService,
-  twilioService
+  twilioService,
+  cloudinaryService
 }

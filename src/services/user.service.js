@@ -39,6 +39,26 @@ class UserService {
     }
   }
 
+  static async setProfilePicture(userId, picture) {
+    try {
+      let user = await User.findOne({ _id: userId });
+      user.profilePicture = picture;
+      const savedUser = await user.save();
+      return savedUser;
+    } catch (error) {
+      throw new Error(" Error Setting Profile Picture: " + error.message);
+    }
+  }
+
+  static async updateBasicDetails(userId, profileData) {
+    try {
+      let updatedUser = await User.findOneAndUpdate({ _id: userId }, profileData, { new: true });
+      return updatedUser
+    } catch (error) {
+      throw new Error(" Error updating basic profile details: " + error.message);
+    }
+  }
+
 }
 
 module.exports = UserService;
