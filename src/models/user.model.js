@@ -30,7 +30,6 @@ const userSchema = new Schema({
   phoneNumber: {
     type: String,
     required: true,
-    unique: true,
   },
   password: {
     type: String,
@@ -39,8 +38,12 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  accountCreationCompleted: {
+    type: Boolean,
+    default: false,
+  },
   profilePicture: String,
-  wallets: [{ type: Schema.Types.ObjectId, ref: 'Wallet' }],
+  wallet: { type: Schema.Types.ObjectId, ref: 'Wallet' },
   bankAccounts: [{ type: Schema.Types.ObjectId, ref: 'BankAccount' }],
   referralCodes: [{ type: Schema.Types.ObjectId, ref: 'ReferralCode' }],
   loans: [{ type: Schema.Types.ObjectId, ref: 'Loan' }],

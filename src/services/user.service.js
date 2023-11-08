@@ -59,6 +59,15 @@ class UserService {
     }
   }
 
+  static async updateUser(userId, updatedUserData) {
+    try {
+      let updatedUser = await User.findOneAndUpdate({ _id: userId }, updatedUserData, { new: true });
+      return updatedUser
+    } catch (error) {
+      throw new Error(`Error updating user: ${error.message}`);
+    }
+  }
+
 }
 
 module.exports = UserService;

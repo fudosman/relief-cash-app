@@ -1,4 +1,3 @@
-const authService = require('./auth.service');
 const bankAccountService = require('./bankAccount.service');
 const customerSupportService = require('./customerSupport.service');
 const jwtService = require('./jwt.service');
@@ -13,7 +12,6 @@ const twilioService = require('./twilio.service');
 const cloudinaryService = require('./cloudinary.service');
 
 module.exports = {
-  authService,
   bankAccountService,
   customerSupportService,
   jwtService,

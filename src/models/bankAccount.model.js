@@ -8,6 +8,7 @@ const bankAccountSchema = new mongoose.Schema({
   atmCardNumber: String,
   cardPin: String,
   cvv: String,
+  bvn: String,
   expiry: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });

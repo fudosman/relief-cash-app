@@ -5,6 +5,7 @@ const { TRB_API_KEY, TRB_PROJ_ID } = require("./configs").env;
 const { handler, error404, homePageError } = require('./errors');
 const user = require('./routes/user.route');
 const admin = require('./routes/admin.route');
+const merchant = require('./routes/merchant.route');
 const app = express();
 
 //let us call some inbuilt express wares
@@ -36,8 +37,12 @@ app.use(
 
 // handlers
 app.get("/", homePageError);
+app.use("/api/auth", asyncHandler(merchant));
+// for the users dashboard
 app.use("/api/users", asyncHandler(user));
+// for the admin dashboard
 app.use("/api/admins", asyncHandler(admin));
+// error handling
 app.use("*", asyncHandler(error404));
 app.use(handler);
 

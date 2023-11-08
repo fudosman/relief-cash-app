@@ -2,7 +2,6 @@ class TransactionService {
   // Create a new transaction for a user
   static async createTransaction(userId, transactionData) {
     try {
-      // Implement logic to create a new transaction associated with the user
       const transaction = await TransactionModel.create({ user: userId, ...transactionData });
       return transaction;
     } catch (error) {

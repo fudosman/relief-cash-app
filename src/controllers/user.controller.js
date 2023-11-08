@@ -71,47 +71,6 @@ const register = async function (req, res) {
   }
 };
 
-// userLogin
-const login = async function (req, res) {
-  try {
-    const payload = req.body;
-    const userData = {
-      email: payload.email,
-      password: payload.password
-    };
-
-    const user = await userService.fetchUserByEmail(userData.email);
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'User not found',
-      })
-    }
-    const isValid = await hashService.verifyPassword(user.password, userData.password);
-    let token;
-
-    if (isValid) {
-      token = await jwtService.signToken({ user });
-    }
-
-    if (!token) {
-      return res.status(305).json({
-        success: false,
-        error: `Error creating token`
-      })
-    }
-    return res.status(200).json({
-      success: true,
-      message: "user signed in successfully",
-      token: token
-    })
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    })
-  }
-};
 
 const uploadImage = async function (req, res) {
   try {
@@ -136,6 +95,18 @@ const uploadImage = async function (req, res) {
   }
 };
 
+const getWalletBalance = async function (req, res) {
+  try {
+    const userId = req.params.userId;
+    const balance = await walletService.getWallet(walletId);
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
 const verifyAndLoanOut = async function (req, res) {
   try {
     const { merchantId, customerId } = req.params;
@@ -231,8 +202,8 @@ const editProfile = async (req, res) => {
 
 module.exports = {
   register,
-  login,
   verifyAndLoanOut,
   uploadImage,
   editProfile,
-}
+  getWalletBalance
+};
