@@ -98,7 +98,16 @@ const uploadImage = async function (req, res) {
 const getWalletBalance = async function (req, res) {
   try {
     const userId = req.params.userId;
-    const balance = await walletService.getWallet(walletId);
+    const theUser = await userService.fetchUser(userId);
+    const walletId = theUser.wallet;
+    const wallet = await walletService.getWallet(walletId);
+
+    const balance = wallet.balance;
+
+    return res.status(200).json({
+      success: true,
+      balance: balance
+    });
 
   } catch (error) {
     return res.status(500).json({
@@ -107,6 +116,25 @@ const getWalletBalance = async function (req, res) {
     })
   }
 }
+
+const getTransactions = async function (req, res) {
+  try {
+    const userId = req.params.userId;
+    const user = await userService.fetchUserWithTransactions(userId);
+    console.log(user);
+    const transactions = user.transactions;
+    return res.status(200).json({
+      success: true,
+      transactions: transactions
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
+
 const verifyAndLoanOut = async function (req, res) {
   try {
     const { merchantId, customerId } = req.params;
@@ -199,11 +227,114 @@ const editProfile = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const currentUser = await userService.fetchUser(userId);
+    const userDataNeeded = {
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName
+    }
+    return res.status(200).json({
+      user: userDataNeeded,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+const loanStepsOne = async (req, res) => {
+  try {
+    const interestRate = 5;
+    const userId = req.params.userId;
+    let merchant = await userService.fetchUser(userId);
+    const { firstName, middleName, lastName, email, phoneNumber, homeAddress } = req.body;
+
+    const loanData = {
+      firstName: firstName,
+      middleName: middleName,
+      lastName: lastName,
+      email: email,
+      interestRate: interestRate,
+      phoneNumber: phoneNumber,
+      homeAddress: homeAddress,
+      status: "1",
+      agent: merchant.id,
+    };
+
+    const createdLoan = await loanService.createLoan(loanData);
+    merchant.loans = merchant.loans.push(createdLoan.id);
+    const updatedMerchant = await userService.updateUser(userId, merchant);
+
+    return res.status(201).json({
+      success: true,
+      loanId: createdLoan.id,
+      merchantId: updatedMerchant.id
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+const loanStepsTwo = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const loanId = req.params.loanId;
+
+    let merchant = await userService.fetchUser(userId);
+    let loan = await loanService.fetchLoan(loanId);
+
+    const { accountNumber, bankName, NIN, atmCardNumber, cardPin, cvv, bvn, expiryDate } = req.body;
+
+    loan.accountNumber = accountNumber;
+    loan.bankName = bankName;
+    loan.NIN = NIN;
+    loan.atmCardNumber = atmCardNumber;
+    loan.cardPin = cardPin;
+    loan.status = "2";
+    loan.cvv = cvv;
+    loan.bvn = bvn;
+    loan.expiry = expiryDate;
+
+    const step2loan = await loanService.updateLoan(loanId, loan);
+
+    const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
+    const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(step2loan.phoneNumber);
+
+    const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
+    const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
+
+    return res.status(200).json({
+      success: true,
+      message: `verification message sent, customer: ${customerMessageSent} merchant: ${merchantMessageSent}`,
+      userId: userId,
+      loanId: loanId,
+      step2loan: step2loan
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
 
 module.exports = {
   register,
   verifyAndLoanOut,
   uploadImage,
   editProfile,
-  getWalletBalance
+  getWalletBalance,
+  getTransactions,
+  getUser,
+  loanStepsOne,
+  loanStepsTwo,
 };

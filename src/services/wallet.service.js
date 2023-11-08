@@ -11,10 +11,9 @@ class WalletService {
   }
 
   // Retrieve a user's wallet
-  static async getWallet(userId) {
+  static async getWallet(walletId) {
     try {
-      // Implement logic to fetch the user's wallet
-      const wallet = await WalletModel.findOne({ user: userId });
+      const wallet = await Wallet.findOne({ _id: walletId });
       return wallet;
     } catch (error) {
       throw new Error('Error getting wallet');

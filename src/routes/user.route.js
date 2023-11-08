@@ -5,22 +5,28 @@ const { jwtService } = require('../services');
 const { multer } = require("../middlewares");
 const asyncHandler = require("express-async-handler");
 
+// dashboard
+router.get("/:userId", jwtService.protectRoute, user.getUser);
+router.get("/:userId/balance", jwtService.protectRoute, user.getWalletBalance);
 
-router.get("/:userId/balance", user.getWalletBalance);
+// loans 
+// router.post("/:userId/bankAccounts", jwtService.protectRoute, user.getBankAccounts);
+// router.post("/:userId/bankAccount/:bankAccountId", jwtService.protectRoute, user.getSingleBankAccount);
 
-// router.post("/:userId/transactions", user.);
-// router.post("/:userId/transactions/transactionId", user.);
-// router.post("/:userId/bankAccount/:bankAccountId", user.);
-// router.post("/:userId/bankAccount/:bankAccountId", user.);
-// router.post("/:userId/notifications", user.);
-// router.post("/:userId/notifications/:notificationId", user.);
-// router.post("/:userId/loans", user.);
-// router.post("/:userId/loans/:loanId", user.);
+// router.post("/:userId/notifications", user.getNotifications);
+// router.post("/:userId/notifications/:notificationId", user.getSingleNotification);
 
+router.post("/:userId/loans/", jwtService.protectRoute, user.loanStepsOne);
+router.put("/:userId/loans/:loanId/", jwtService.protectRoute, user.loanStepsTwo);
 
-router.post("/verify/:customerId/merchant/:merchantId", user.verifyAndLoanOut);
-router.put("/:userId/image", jwtService.protectRoute, multer, asyncHandler(user.uploadImage));
+// router.post("/:userId/loans/:loanId", user.getSingleLoan);
+
+router.get("/:userId/transactions", jwtService.protectRoute, user.getTransactions);
+// router.post("/:userId/transactions/:transactionId", jwtService.protectRoute, user.getSingleTransaction);
+
 router.put("/:userId", jwtService.protectRoute, user.editProfile);
+router.put("/:userId/image", jwtService.protectRoute, multer, asyncHandler(user.uploadImage));
+router.post("/verify/:customerId/merchant/:merchantId", user.verifyAndLoanOut);
 
 module.exports = router;
 

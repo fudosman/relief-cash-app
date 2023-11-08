@@ -16,7 +16,6 @@ const tierSchema = new Schema({
 
 // Define the user schema
 const userSchema = new Schema({
-  title: String,
   firstName: String,
   lastName: String,
   middleName: String,
