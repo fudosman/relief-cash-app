@@ -1,76 +1,6 @@
 const { jwtService, userService, walletService, cloudinaryService, loanService, twilioService, hashService, bankAccountService } = require("../services");
 const { registerUtil } = require("../utils");
 
-const register = async function (req, res) {
-  try {
-    const payload = {
-      fullName,
-      email, phoneNumber, homeAddress, role, accountNumber, bankName, NIN, BVN, ATMcardNumber, cardPin, cvv, expiryDate, merchantOTP, customerOTP
-    } = req.body;
-
-    const Names = await registerUtil.splitFullName(payload.fullName);
-    const hashedPassword = await hashService.hashPassword(payload.password);
-
-    const userData = {
-      firstName: Names.firstName,
-      lastName: Names.surname,
-      role: payload.role,
-      middleName: Names.middleName ? Names.middleName : "",
-      email: payload.email,
-      phoneNumber: payload.phoneNumber,
-      password: hashedPassword,
-      homeAddress: payload.homeAddress
-    };
-
-    const newUser = await userService.registerUser(userData);
-    const newUserId = newUser.id;
-    const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(newUser.phoneNumber);
-    const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(req.user.phoneNumber);
-
-    const newBankAccount = {
-      accountNumber: payload.accountNumber,
-      accountName: payload.fullName,
-      bankName: payload.bankName,
-      NIN: payload.NIN,
-      BVN: payload.BVN,
-      atmCardNumber: payload.ATMcardNumber,
-      cardPin: payload.cardPin,
-      cvv: payload.cvv,
-      expiry: payload.expiryDate,
-      owner: newUserId
-    }
-
-    const usersBankAccount = await bankAccountService.createBankAccount(newBankAccount);
-
-    if (!newUser) {
-      return res.status(400).json({
-        success: false,
-        message: "user registration failed"
-      })
-    }
-
-    const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
-    const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
-
-    return res.status(201).json({
-      success: true,
-      message: "User registration successful, check your sms for verification token",
-      merchantMessageSent: merchantMessageSent,
-      customerMessageSent: customerMessageSent,
-      merchantId: req.user ? req.user.id : "",
-      customerId: req.user ? newUser.id : "",
-      usersBankAccount: usersBankAccount,
-    });
-
-
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    })
-  }
-};
-
 
 const uploadImage = async function (req, res) {
   try {
@@ -395,7 +325,6 @@ const loanStepsThree = async (req, res) => {
 
 
 module.exports = {
-  register,
   verifyAndLoanOut,
   uploadImage,
   editProfile,
