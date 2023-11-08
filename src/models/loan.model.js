@@ -2,15 +2,24 @@ const mongoose = require('mongoose');
 
 const loanSchema = new mongoose.Schema({
 
-  firstname: String,
-  middlename: String,
-  lastname: String,
+  firstName: String,
+  middleName: String,
+  lastName: String,
   email: String,
   phoneNumber: String,
   homeAddress: String,
+  interestRate: Number,
+  applicationCompleted: {
+    type: Boolean,
+    default: false
+  },
+  agent: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  status: {
+    type: String,
+    enum: ["1", "2", "pending", "approved", "rejected", "repaid"],
+    default: "pending"
+  },
 
-  knowingDuration: String,
-  amount: Number,
   accountNumber: String,
   bankName: String,
   NIN: String,
@@ -20,17 +29,12 @@ const loanSchema = new mongoose.Schema({
   cvv: String,
   expiry: Date,
 
+  amount: Number,
+  knowingDuration: String,
   mchtAgreeToTandC: Boolean,
   ctmAgreeToTandC: Boolean,
-  interestRate: Number,
-  status: {
-    type: String,
-    enum: ["1", "2", "pending", "approved", "rejected", "repaid"],
-    default: "pending"
-  },
   rejectReason: String,
   referralCode: String,
-  agent: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
 const Loan = mongoose.model('Loan', loanSchema);

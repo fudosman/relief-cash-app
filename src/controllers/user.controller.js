@@ -304,16 +304,17 @@ const loanStepsTwo = async (req, res) => {
     loan.expiry = expiryDate;
 
     const step2loan = await loanService.updateLoan(loanId, loan);
+    console.log(step2loan);
 
     const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
     const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(step2loan.phoneNumber);
 
-    const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
-    const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
+    // const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
+    // const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
 
     return res.status(200).json({
       success: true,
-      message: `verification message sent, customer: ${customerMessageSent} merchant: ${merchantMessageSent}`,
+      // message: `verification message sent, customer: ${customerMessageSent} merchant: ${merchantMessageSent}`,
       userId: userId,
       loanId: loanId,
       step2loan: step2loan
@@ -327,6 +328,72 @@ const loanStepsTwo = async (req, res) => {
   }
 }
 
+const loanStepsThree = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const loanId = req.params.loanId;
+
+    const [merchant, loan] = await Promise.all([
+      userService.fetchUser(userId),
+      loanService.fetchLoan(loanId),
+    ]);
+
+    const {
+      mchtAgreeToTandC,
+      ctmAgreeToTandC,
+      merchantOTP,
+      customerOTP,
+      knowingDuration,
+      loanAmount,
+      referralCode,
+    } = req.body;
+
+    const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
+    const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(loan.phoneNumber);
+
+    console.log({
+      merchantPhoneNumberToBeVerified,
+      customerPhoneNumberToBeVerified,
+    });
+
+    const [merchantVerificationStatus, customerVerificationStatus] = await Promise.all([
+      twilioService.checkOTP(merchantPhoneNumberToBeVerified, merchantOTP),
+      twilioService.checkOTP(customerPhoneNumberToBeVerified, customerOTP),
+    ]);
+
+    if (customerVerificationStatus !== "approved" || merchantVerificationStatus !== "approved") {
+      return res.status(403).json({
+        success: false,
+        message: "Either user or customer's OTP is not approved, try again",
+      });
+    }
+
+    if (merchantVerificationStatus === "approved" && customerVerificationStatus === "approved") {
+      loan.mchtAgreeToTandC = mchtAgreeToTandC;
+      loan.ctmAgreeToTandC = ctmAgreeToTandC;
+      loan.knowingDuration = knowingDuration;
+      loan.amount = loanAmount;
+      loan.referralCode = referralCode;
+      loan.status = "pending";
+      loan.applicationCompleted = true;
+      const appliedLoan = await loanService.updateLoan(loanId, loan);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Successfully updated loan status to pending',
+        loanId: loanId,
+        loanDetails: appliedLoan,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
   register,
   verifyAndLoanOut,
@@ -337,4 +404,5 @@ module.exports = {
   getUser,
   loanStepsOne,
   loanStepsTwo,
+  loanStepsThree,
 };
