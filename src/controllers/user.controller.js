@@ -239,12 +239,12 @@ const loanStepsTwo = async (req, res) => {
     const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
     const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(step2loan.phoneNumber);
 
-    // const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
-    // const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
+    const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
+    const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
 
     return res.status(200).json({
       success: true,
-      // message: `verification message sent, customer: ${customerMessageSent} merchant: ${merchantMessageSent}`,
+      message: `verification message sent, customer: ${customerMessageSent} merchant: ${merchantMessageSent}`,
       userId: userId,
       loanId: loanId,
       step2loan: step2loan

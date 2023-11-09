@@ -8,6 +8,15 @@ const asyncHandler = require("express-async-handler");
 // dashboard
 router.get("/:userId", jwtService.protectRoute, user.getUser);
 router.get("/:userId/balance", jwtService.protectRoute, user.getWalletBalance);
+router.post("/:userId/loans/", jwtService.protectRoute, user.loanStepsOne);
+router.put("/:userId/loans/:loanId/", jwtService.protectRoute, user.loanStepsTwo);
+router.put("/:userId/loans/:loanId/verify", jwtService.protectRoute, user.loanStepsThree);
+
+router.get("/:userId/transactions", jwtService.protectRoute, user.getTransactions);
+
+router.put("/:userId", jwtService.protectRoute, user.editProfile);
+router.put("/:userId/image", jwtService.protectRoute, multer, asyncHandler(user.uploadImage));
+router.post("/verify/:customerId/merchant/:merchantId", user.verifyAndLoanOut);
 
 // loans 
 // router.post("/:userId/bankAccounts", jwtService.protectRoute, user.getBankAccounts);
@@ -16,18 +25,11 @@ router.get("/:userId/balance", jwtService.protectRoute, user.getWalletBalance);
 // router.post("/:userId/notifications", user.getNotifications);
 // router.post("/:userId/notifications/:notificationId", user.getSingleNotification);
 
-router.post("/:userId/loans/", jwtService.protectRoute, user.loanStepsOne);
-router.put("/:userId/loans/:loanId/", jwtService.protectRoute, user.loanStepsTwo);
-router.put("/:userId/loans/:loanId/verify", jwtService.protectRoute, user.loanStepsThree);
-
 // router.post("/:userId/loans/:loanId", user.getSingleLoan);
-
-router.get("/:userId/transactions", jwtService.protectRoute, user.getTransactions);
 // router.post("/:userId/transactions/:transactionId", jwtService.protectRoute, user.getSingleTransaction);
 
-router.put("/:userId", jwtService.protectRoute, user.editProfile);
-router.put("/:userId/image", jwtService.protectRoute, multer, asyncHandler(user.uploadImage));
-router.post("/verify/:customerId/merchant/:merchantId", user.verifyAndLoanOut);
+
+
 
 module.exports = router;
 
