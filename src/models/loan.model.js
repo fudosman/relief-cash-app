@@ -35,6 +35,8 @@ const loanSchema = new mongoose.Schema({
   ctmAgreeToTandC: Boolean,
   rejectReason: String,
   referralCode: String,
+}, {
+  timestamps: true,
 });
 
 const Loan = mongoose.model('Loan', loanSchema);

@@ -7,6 +7,8 @@ const walletSchema = new mongoose.Schema({
   },
   // Add other wallet-related fields
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+}, {
+  timestamps: true,
 });
 
 const Wallet = mongoose.model('Wallet', walletSchema);

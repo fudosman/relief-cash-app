@@ -8,8 +8,11 @@ const asyncHandler = require("express-async-handler");
 // dashboard
 router.get("/:userId", jwtService.protectRoute, user.getUser);
 router.get("/:userId/balance", jwtService.protectRoute, user.getWalletBalance);
-router.post("/:userId/loans/", jwtService.protectRoute, user.loanStepsOne);
-router.put("/:userId/loans/:loanId/", jwtService.protectRoute, user.loanStepsTwo);
+
+router.post("/:userId/loans", jwtService.protectRoute, user.loanStepsOne);
+router.get("/:userId/loans", jwtService.protectRoute, user.getUserLoans);
+router.get("/:userId/loans/:loanId", jwtService.protectRoute, user.getSingleUserLoan);
+router.put("/:userId/loans/:loanId", jwtService.protectRoute, user.loanStepsTwo);
 router.put("/:userId/loans/:loanId/verify", jwtService.protectRoute, user.loanStepsThree);
 
 router.get("/:userId/transactions", jwtService.protectRoute, user.getTransactions);

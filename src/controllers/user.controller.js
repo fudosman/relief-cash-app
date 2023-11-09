@@ -50,12 +50,28 @@ const getWalletBalance = async function (req, res) {
 const getTransactions = async function (req, res) {
   try {
     const userId = req.params.userId;
-    const user = await userService.fetchUserWithTransactions(userId);
-    console.log(user);
-    const transactions = user.transactions;
+
+    const currentUser = await userService.fetchUser(userId);
+    if (!currentUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'current user not found',
+      });
+    }
+    const usersLoanIds = currentUser.loans;
+
+    let userLoans = [];
+
+    for (let i = 0; i < usersLoanIds.length; i++) {
+      const newLoan = await loanService.fetchLoan(usersLoanIds[i]);
+      userLoans.push(newLoan);
+    }
+
+    const currentUsersLoans = userLoans;
     return res.status(200).json({
       success: true,
-      transactions: transactions
+      message: "User transactions were successfully fetched ",
+      transactions: currentUsersLoans,
     })
   } catch (error) {
     return res.status(500).json({
@@ -323,6 +339,83 @@ const loanStepsThree = async (req, res) => {
   }
 };
 
+const getUserLoans = async (req, res) => {
+  try {
+
+    const userId = req.params.userId;
+    const { applicationCompleted } = req.query;
+
+    const currentUser = await userService.fetchUser(userId);
+    if (!currentUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'current user not found',
+      });
+    }
+    const usersLoanIds = currentUser.loans;
+
+    let userLoans = [];
+    let ongoingLoanApplications = [];
+    let completedLoanApplications = [];
+
+    for (let i = 0; i < usersLoanIds.length; i++) {
+      const newLoan = await loanService.fetchLoan(usersLoanIds[i]);
+      userLoans.push(newLoan);
+    }
+
+    const currentUsersLoans = userLoans;
+
+    if (applicationCompleted === "false") {
+      ongoingLoanApplications = currentUsersLoans.filter(loan => loan.applicationCompleted === false);
+      return res.status(200).json({
+        success: true,
+        message: "Saved Applications Fetched Successfully",
+        savedApplications: ongoingLoanApplications
+      });
+    }
+
+    if (applicationCompleted === "true") {
+      completedLoanApplications = currentUsersLoans.filter(loan => loan.applicationCompleted === true);
+      return res.status(200).json({
+        success: true,
+        message: "Pending Loan Applications Fetched Successfully",
+        pendingLoans: completedLoanApplications
+      });
+    }
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+const getSingleUserLoan = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const loanId = req.params.loanId;
+
+    const [currentUser, loan] = await Promise.all([
+      userService.fetchUser(userId),
+      loanService.fetchLoan(loanId),
+    ]);
+
+    // to ensure that the user requesting for the loan requests is the logged in user
+    if (JSON.stringify(loan.agent) === JSON.stringify(currentUser._id)) {
+      return res.status(200).json({
+        success: true,
+        message: 'users single loan fetched successfully',
+        loan: loan
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
 
 module.exports = {
   verifyAndLoanOut,
@@ -334,4 +427,6 @@ module.exports = {
   loanStepsOne,
   loanStepsTwo,
   loanStepsThree,
+  getUserLoans,
+  getSingleUserLoan
 };

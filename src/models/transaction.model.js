@@ -5,6 +5,8 @@ const transactionSchema = new mongoose.Schema({
   type: String, // Incoming or Outgoing
   // Add other transaction-related fields
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+}, {
+  timestamps: true,
 });
 
 const Transaction = mongoose.model('Transaction', transactionSchema);

@@ -13,7 +13,6 @@ User Profile Management:
 ✅getUserById(userId)
 ✅updateUser(userId, userData)
 ✅changePassword(userId, newPassword)
-✅deleteUser(userId)
 ✅getReferrer(userId)
 ✅getReferredUsers(userId)
 ✅checkCreditRating(userId)

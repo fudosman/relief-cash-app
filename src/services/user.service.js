@@ -68,15 +68,6 @@ class UserService {
     }
   }
 
-  static async fetchUserWithTransactions(userId) {
-    try {
-      let user = await User.findOne({ _id: userId }).populate('transactions');
-      return user;
-    } catch (error) {
-      throw new Error(`Error fetching user transactions: ${error.message}`);
-    }
-  }
-
 }
 
 module.exports = UserService;

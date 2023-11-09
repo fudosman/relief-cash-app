@@ -11,6 +11,8 @@ const bankAccountSchema = new mongoose.Schema({
   bvn: String,
   expiry: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+}, {
+  timestamps: true,
 });
 
 const BankAccount = mongoose.model('BankAccount', bankAccountSchema);

@@ -5,6 +5,8 @@ const referralCodeSchema = new mongoose.Schema({
   referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   referredUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   // Add other referral code-related fields
+}, {
+  timestamps: true,
 });
 
 const ReferralCode = mongoose.model('ReferralCode', referralCodeSchema);
