@@ -1,14 +1,14 @@
 const twilio = require('twilio');
-const { accountSid, apiKeySecret, verifySid } = require("../configs").env;
+const { accountSid, apiKeySecret, myPhoneNumber, verifySid } = require("../configs").env;
 
 const authToken = apiKeySecret;
 class TwilioService {
-  static async sendSMS(phoneNumber) {
+  static async sendSMS() {
     const client = twilio(accountSid, authToken, { timeout: 90000 });
 
     try {
       const verification = await client.verify.v2.services(verifySid)
-        .verifications.create({ to: phoneNumber, channel: 'sms' });
+        .verifications.create({ to: myPhoneNumber, channel: 'sms' });
 
       // console.log(verification.status);
     } catch (error) {
@@ -16,12 +16,12 @@ class TwilioService {
     }
   }
 
-  static async checkOTP(phoneNumber, otpCode) {
+  static async checkOTP(otpCode) {
     const client = twilio(accountSid, authToken, { timeout: 90000 });
 
     try {
       const verificationCheck = await client.verify.v2.services(verifySid)
-        .verificationChecks.create({ to: phoneNumber, code: otpCode });
+        .verificationChecks.create({ to: myPhoneNumber, code: otpCode });
 
       return verificationCheck.status;
     } catch (error) {
