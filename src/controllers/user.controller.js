@@ -51,6 +51,7 @@ const getTransactions = async function (req, res) {
     const userId = req.params.userId;
 
     const currentUser = await userService.fetchUser(userId);
+
     if (!currentUser) {
       return res.status(400).json({
         success: false,
@@ -258,7 +259,7 @@ const loanStepsTwo = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `verification message sent, customer: ${customerMessageSent} merchant: ${merchantMessageSent}`,
+      message: `verification message sent`,
       userId: userId,
       loanId: loanId,
       step2loan: step2loan
