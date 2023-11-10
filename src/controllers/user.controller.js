@@ -51,7 +51,6 @@ const getTransactions = async function (req, res) {
     const userId = req.params.userId;
 
     const currentUser = await userService.fetchUser(userId);
-
     if (!currentUser) {
       return res.status(400).json({
         success: false,
@@ -251,15 +250,15 @@ const loanStepsTwo = async (req, res) => {
 
     const step2loan = await loanService.updateLoan(loanId, loan);
 
-    // const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
-    // const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(step2loan.phoneNumber);
+    const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
+    const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(step2loan.phoneNumber);
 
-    const merchantMessageSent = await twilioService.sendSMS();
-    const customerMessageSent = await twilioService.sendSMS();
+    const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
+    const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
 
     return res.status(200).json({
       success: true,
-      message: `verification message sent`,
+      message: `verification message sent, customer: ${customerMessageSent} merchant: ${merchantMessageSent}`,
       userId: userId,
       loanId: loanId,
       step2loan: step2loan
@@ -293,12 +292,22 @@ const loanStepsThree = async (req, res) => {
       referralCode,
     } = req.body;
 
+    const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
+    const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(loan.phoneNumber);
 
-    const merchantVerificationStatus = await twilioService.checkOTP(merchantOTP);
-    const customerVerificationStatus = await twilioService.checkOTP(customerOTP);
+    const [merchantVerificationStatus, customerVerificationStatus] = await Promise.all([
+      twilioService.checkOTP(merchantPhoneNumberToBeVerified, merchantOTP),
+      twilioService.checkOTP(customerPhoneNumberToBeVerified, customerOTP),
+    ]);
 
+    if (customerVerificationStatus !== "approved" || merchantVerificationStatus !== "approved") {
+      return res.status(403).json({
+        success: false,
+        message: "Either user or customer's OTP is not approved, try again",
+      });
+    }
 
-    if (merchantVerificationStatus === "approved" || customerVerificationStatus === "approved") {
+    if (merchantVerificationStatus === "approved" && customerVerificationStatus === "approved") {
       loan.mchtAgreeToTandC = mchtAgreeToTandC;
       loan.ctmAgreeToTandC = ctmAgreeToTandC;
       loan.knowingDuration = knowingDuration;
