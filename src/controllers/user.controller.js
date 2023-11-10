@@ -299,14 +299,8 @@ const loanStepsThree = async (req, res) => {
     const merchantVerificationStatus = await twilioService.checkOTP(merchantPhoneNumberToBeVerified, merchantOTP);
     const customerVerificationStatus = await twilioService.checkOTP(customerPhoneNumberToBeVerified, customerOTP);
 
-    if (customerVerificationStatus !== "approved" || merchantVerificationStatus !== "approved") {
-      return res.status(403).json({
-        success: false,
-        message: "Either user or customer's OTP is not approved, try again",
-      });
-    }
 
-    if (merchantVerificationStatus === "approved" && customerVerificationStatus === "approved") {
+    if (merchantVerificationStatus === "approved" || customerVerificationStatus === "approved") {
       loan.mchtAgreeToTandC = mchtAgreeToTandC;
       loan.ctmAgreeToTandC = ctmAgreeToTandC;
       loan.knowingDuration = knowingDuration;
