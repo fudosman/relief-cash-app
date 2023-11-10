@@ -295,10 +295,8 @@ const loanStepsThree = async (req, res) => {
     const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
     const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(loan.phoneNumber);
 
-    const [merchantVerificationStatus, customerVerificationStatus] = await Promise.all([
-      twilioService.checkOTP(merchantPhoneNumberToBeVerified, merchantOTP),
-      twilioService.checkOTP(customerPhoneNumberToBeVerified, customerOTP),
-    ]);
+    const merchantVerificationStatus = await twilioService.checkOTP(merchantPhoneNumberToBeVerified, merchantOTP);
+    const customerVerificationStatus = await twilioService.checkOTP(customerPhoneNumberToBeVerified, customerOTP);
 
     if (customerVerificationStatus !== "approved" || merchantVerificationStatus !== "approved") {
       return res.status(403).json({
