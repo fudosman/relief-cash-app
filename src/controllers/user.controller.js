@@ -9,7 +9,6 @@ const uploadImage = async function (req, res) {
     const media = await cloudinaryService.uploadMedia(file[0]);
 
     const profilePicture = media.secure_url;
-
     const userWithProfilePicture = await userService.setProfilePicture(req.user.id, profilePicture);
 
     return res.status(200).json({
@@ -250,7 +249,6 @@ const loanStepsTwo = async (req, res) => {
     loan.expiry = expiryDate;
 
     const step2loan = await loanService.updateLoan(loanId, loan);
-    console.log(step2loan);
 
     const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
     const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(step2loan.phoneNumber);
@@ -296,11 +294,6 @@ const loanStepsThree = async (req, res) => {
 
     const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
     const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(loan.phoneNumber);
-
-    console.log({
-      merchantPhoneNumberToBeVerified,
-      customerPhoneNumberToBeVerified,
-    });
 
     const [merchantVerificationStatus, customerVerificationStatus] = await Promise.all([
       twilioService.checkOTP(merchantPhoneNumberToBeVerified, merchantOTP),
@@ -417,6 +410,130 @@ const getSingleUserLoan = async (req, res) => {
   }
 }
 
+const editBankDetails = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const accountId = req.params.accountId;
+
+    const { accountNumber, bankName, NIN, bvn, atmCardNumber, cardPin, cvv, expiry } = req.query;
+
+    const expiryDate = new Date(expiry);
+    if (!expiryDate) {
+      return res.status(400).json({
+        success: false, message: "Invalid date format provided"
+      })
+    }
+
+    const bankData = {};
+    const message = [];
+
+    if (accountNumber) {
+      bankData.accountNumber = accountNumber;
+      message.push("accountNumber updated");
+    }
+    if (bankName) {
+      bankData.bankName = bankName;
+      message.push("bankName updated");
+    }
+
+    if (NIN) {
+      bankData.NIN = NIN;
+      message.push("NIN updated");
+    }
+
+    if (bvn) {
+      bankData.bvn = bvn;
+      message.push("bvn updated");
+    }
+    if (atmCardNumber) {
+      bankData.atmCardNumber = atmCardNumber;
+      message.push("atmCardNumber updated");
+    }
+    if (cardPin) {
+      bankData.cardPin = cardPin;
+      message.push("cardPin updated");
+    }
+    if (cvv) {
+      bankData.cvv = cvv;
+      message.push("cvv updated");
+    }
+    if (expiryDate) {
+      bankData.expiry = expiryDate;
+      message.push("expiry updated");
+    }
+
+    const updatedBankAccount = await bankAccountService.updateBankAccountDetails(accountId, bankData);
+    const singleMessage = message.join(", ");
+
+    return res.status(200).json({
+      success: true,
+      message: singleMessage,
+      bankAccount: updatedBankAccount,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+const getBankAccounts = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const currentUser = await userService.fetchUser(userId);
+    const bankAccountIds = currentUser.bankAccounts;
+    let userBankAccount = [];
+
+    for (let i = 0; i < bankAccountIds.length; i++) {
+      const retrievedBank = await bankAccountService.fetchBankAccount(bankAccountIds[i]);
+      userBankAccount.push(retrievedBank);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Bank Accounts successfully retrieved',
+      BankAccounts: userBankAccount
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+
+const getSingleBankAccount = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const accountId = req.params.accountId;
+    const retrievedBank = await bankAccountService.fetchBankAccount(accountId);
+
+    if (!retrievedBank) {
+      return res.status(400).json({
+        success: false,
+        message: 'bank account not found'
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'bank account retrieved successfully',
+      bankAccount: retrievedBank
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+
+
 module.exports = {
   verifyAndLoanOut,
   uploadImage,
@@ -428,5 +545,8 @@ module.exports = {
   loanStepsTwo,
   loanStepsThree,
   getUserLoans,
-  getSingleUserLoan
+  getSingleUserLoan,
+  editBankDetails,
+  getBankAccounts,
+  getSingleBankAccount,
 };

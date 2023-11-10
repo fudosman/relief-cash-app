@@ -18,7 +18,12 @@ router.put("/:userId/loans/:loanId/verify", jwtService.protectRoute, user.loanSt
 router.get("/:userId/transactions", jwtService.protectRoute, user.getTransactions);
 
 router.put("/:userId", jwtService.protectRoute, user.editProfile);
-router.put("/:userId/image", jwtService.protectRoute, multer, asyncHandler(user.uploadImage));
+
+router.get("/:userId/accounts", jwtService.protectRoute, user.getBankAccounts);
+router.get("/:userId/accounts/:accountId", jwtService.protectRoute, user.getSingleBankAccount);
+
+router.put("/:userId/accounts/:accountId", jwtService.protectRoute, user.editBankDetails);
+router.put("/:userId/images", jwtService.protectRoute, multer, asyncHandler(user.uploadImage));
 router.post("/verify/:customerId/merchant/:merchantId", user.verifyAndLoanOut);
 
 // loans 
