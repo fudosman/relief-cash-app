@@ -250,15 +250,15 @@ const loanStepsTwo = async (req, res) => {
 
     const step2loan = await loanService.updateLoan(loanId, loan);
 
-    const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
-    const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(step2loan.phoneNumber);
+    // const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
+    // const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(step2loan.phoneNumber);
 
-    const merchantMessageSent = await twilioService.sendSMS(merchantPhoneNumberToBeVerified);
-    const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
+    await twilioService.sendSMS();
+    // const customerMessageSent = await twilioService.sendSMS(customerPhoneNumberToBeVerified);
 
     return res.status(200).json({
       success: true,
-      message: `verification message sent, customer: ${customerMessageSent} merchant: ${merchantMessageSent}`,
+      message: `verification message sent`,
       userId: userId,
       loanId: loanId,
       step2loan: step2loan
@@ -292,22 +292,19 @@ const loanStepsThree = async (req, res) => {
       referralCode,
     } = req.body;
 
-    const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
-    const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(loan.phoneNumber);
+    // const merchantPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(merchant.phoneNumber);
+    // const customerPhoneNumberToBeVerified = await registerUtil.formatPhoneNumber(loan.phoneNumber);
 
-    const [merchantVerificationStatus, customerVerificationStatus] = await Promise.all([
-      twilioService.checkOTP(merchantPhoneNumberToBeVerified, merchantOTP),
-      twilioService.checkOTP(customerPhoneNumberToBeVerified, customerOTP),
-    ]);
+    const merchantVerificationStatus = await twilioService.checkOTP(merchantOTP);
 
-    if (customerVerificationStatus !== "approved" || merchantVerificationStatus !== "approved") {
+    if (merchantVerificationStatus !== "approved") {
       return res.status(403).json({
         success: false,
-        message: "Either user or customer's OTP is not approved, try again",
+        message: "Either merchant's or customer's OTP is not approved, try again!",
       });
     }
 
-    if (merchantVerificationStatus === "approved" && customerVerificationStatus === "approved") {
+    if (merchantVerificationStatus === "approved") {
       loan.mchtAgreeToTandC = mchtAgreeToTandC;
       loan.ctmAgreeToTandC = ctmAgreeToTandC;
       loan.knowingDuration = knowingDuration;
